@@ -1,0 +1,102 @@
+path {
+  fill: none;
+  stroke: #000;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.title1 {
+  font-family: 'Audiowide', cursive;
+  font-size:25px;
+  fill:#0965B8;
+}
+
+.title2 {
+  font-family: 'IM Fell English SC', serif;
+  font-size:25px;
+}
+
+.disclaimer {
+  font-family: 'IM Fell English SC', serif;
+  font-size:16px;
+}
+
+.tooltip {
+  position:absolute;
+  padding: 15px 15px 19px 15px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  border-radius: 6px;
+  font-family: 'Yanone Kaffeesatz', sans-serif;
+  white-space: nowrap;
+}
+
+.tooltip:after {
+  box-sizing: border-box;
+  display: inline;
+  line-height: 1;
+  font-size: 10px;
+  width: 20px;
+  top:98%;
+  left:30px;
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.8);
+  content: "\25BC";
+  position: absolute;
+  text-align: center;
+}
+
+.tooltip img{
+  margin:5px auto;
+  width:50px;
+  height:50px;
+  display:block;
+}
+
+.tooltip-name {
+  text-align:center;
+}
+
+#us-map {
+  margin: 0px auto;
+  display:block;
+  width:900px;
+  height:500px;
+}
+
+.legend{
+  font-family: 'IM Fell English SC', serif;
+}
+
+.state {
+  stroke:white;
+  stroke-width:1px;
+}
+
+.state:hover {
+  opacity: 0.7; !important;
+}
+
+.address {
+  stroke: #FFF; stroke-width: 2px; 
+}
+
+.address:hover {
+  opacity: 0.7; !important;
+}  
+
+.major_road { 
+  stroke: #776; 
+}
+
+.minor_road { 
+  stroke: #ccb; 
+}
+
+.highway { 
+  stroke: #000; stroke-width: 1.5px; 
+}
+
+.rail { 
+  stroke: #7de; 
+}

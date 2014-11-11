@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<head>
+<meta charset="utf-8" />
+
+<link href='http://fonts.googleapis.com/css?family=IM+Fell+English+SC|Audiowide|Yanone+Kaffeesatz:400,700' rel='stylesheet' type='text/css'>
+<link href='styles/styles.css' rel='stylesheet' type='text/css'>
+
+</head>
+
+<body>
+<div id="us-map"></div>
+
+<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script src="http://d3js.org/topojson.v1.min.js"></script>
+<script src="http://d3js.org/queue.v1.min.js"></script>
+<script>
+
+var width = 900, 
+    height = 650;  
+
+// Color scale
+var color = d3.scale.linear()
+    .domain([0, 1, 11])
+    .range(["#CCC","#7788AA", "#2D4471"]);
+
+// Append a single tooltip div
+var tooltip = d3.select("body")
+    .append("div")
+    .attr("class", "tooltip")
+    .attr("text-anchor", "middle")
+    .style("visibility", "hidden")
+    .text("a simple tooltip");
+
+// Create a new albersUSA
+var projection = d3.geo.albersUsa() 
+    .scale(1000)
+    .translate([width / 2, height / 2])
+    .precision(.1);
+
+var path = d3.geo.path()  
+    .projection(projection);  
+
+var svg = d3.select("#us-map").append("svg")   
+    .attr("width", width)
+    .attr("height", height);
+
+// Set up a queue to get the files in order
+queue()   
+  .defer(d3.json, "data/us.json")
+  .defer(d3.tsv, "data/stateNames.tsv")
+  .defer(d3.tsv, "data/hr21-states.tsv")
+  .await(mapIt);   
+
+// Function executed after the queue has finished
+function mapIt(error,state,stateNames,hackers) {
+  var stateById = {};
+  var rateById = {};
+
+  stateNames.forEach(function(d) { stateById[d.id] = d.name; });
+
+  hackers.forEach(function(d) { rateById[d.id] = { rate : +d.rate, name : stateById[d.id] }; });
+
+  // Add state paths
+  svg.selectAll(".state")   
+    .data(topojson.feature(state, state.objects.states).features)  
+    .enter().append('g').append("path")
+      .attr("class", "state") 
+      .attr("d", path)
+      .style("fill", function(d) { return color(rateById[d.id]["rate"]); })
+    // Mouseover event for tooltip
+    .on("mouseover", function(d){
+       if(rateById[d.id]["rate"] > 0) {
+           return tooltip.style("visibility", "visible")
+          .html(function(){ 
+            var grammar = (rateById[d.id]["rate"] > 1) ? " people" : " person";
+            var info = rateById[d.id]["name"]
+            return rateById[d.id]["name"] + " : <b>" + rateById[d.id]["rate"] + grammar + "</b>";
+          });
+       }
+    })
+    .on("mousemove", function(){return tooltip.style("top",
+        (d3.event.pageY-70)+"px").style("left",(d3.event.pageX-40)+"px");})
+    .on("mouseout", function(){return tooltip.style("visibility", "hidden");});
+
+}
+
+// Add a title text - line 1
+svg.append("text")
+  .attr("class", "title1")
+  .attr("x", width / 2)             
+  .attr("y", height / 7 - 30)
+  .attr("text-anchor", "middle")
+  .text("Hack Reactor 21");
+
+// Add a title text - line 2
+svg.append("text")
+  .attr("class", "title2")
+  .attr("x", width / 2)             
+  .attr("y", height / 7)
+  .attr("color", "0965B8") 
+  .attr("text-anchor", "middle") 
+  .text("where are they from?");
+
+// Add disclaimer text
+svg.append("text")
+  .attr("class", "disclaimer")
+  .attr("x", width - 300)
+  .attr("y", height - 50)
+  .text("* Does not include international students");
+
+
+var legend_domain = [0, 4, 6, 12];
+var legend_size = {width: 30, height: 20};
+
+// Create a legend
+var legend = svg.selectAll("g.legend")
+    .data(legend_domain)
+    .enter().append("g")
+      .attr("class", "legend");
+
+// Append the rectangular boxes for the legend
+legend.append("rect")
+  .attr("x", 800)
+  .attr("y", function(d,i) { return 300 + (i * legend_size.height) + (i * 5) })
+  .attr("width", legend_size.width)
+  .attr("height", legend_size.height)
+  .style("fill", function(d, i) { return color(d); })
+
+// Append the text for the legend
+legend.append("text")
+  .attr("x", 800 + legend_size.width + 10)
+  .attr("y", function(d,i) { return 300 + (i * legend_size.height + 15) + (i * 5) })
+  .text(function(d, i){ return legend_domain[i]; });
+
+</script>
+</body>
+</html>
